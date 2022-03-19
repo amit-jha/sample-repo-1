@@ -25,7 +25,7 @@ pipeline {
 
 def unitTest(){
 
-        sh 'mvn clean test'
+        def appImg = docker.build("shanu040/search-api:${BUILD_VERSION}")
 
 }
 /*
