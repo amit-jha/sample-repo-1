@@ -8,7 +8,7 @@ pipeline {
     stages{
         stage("Test"){
             steps{
-                echo "Execute Unit Test"
+                echo "Execute Unit Test - Build Application"
                 unitTest()
 
             }
@@ -25,7 +25,7 @@ pipeline {
 
 def unitTest(){
 
-        def appImg = docker.build("shanu040/search-api:${BUILD_VERSION}")
+        def appImg = docker.build("shanu040/search-api:1")
 
 }
 /*
