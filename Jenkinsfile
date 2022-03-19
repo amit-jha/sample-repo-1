@@ -24,9 +24,9 @@ pipeline {
 
 
 def unitTest(){
-    dir('SampleSearchApi'){
+
         sh 'mvn clean test'
-    }
+
 }
 /*
 def buildImage(){
