@@ -6,25 +6,25 @@ pipeline {
         disableConcurrentBuilds()
     }
     stages{
-        stage("Test"){
-            steps{
-                echo "Execute Unit Test"
-                unitTest()
-
-            }
-        }
         stage("Build Application"){
             steps{
-                echo "Building Docker image"
+                echo "Building application"
+                buildApp()
 
             }
         }
+        stage("Build Docker Image"){
+                    steps{
+                        echo "Building docker image"
+                        buildApp()
+
+                    }
+                }
     }
 }
 
-
-def unitTest(){
-   sh 'mvn clean test'
+def buildApp(){
+    sh 'mvn clean install'
 }
 
 def buildImage(){
