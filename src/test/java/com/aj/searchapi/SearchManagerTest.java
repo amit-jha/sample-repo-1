@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,13 @@ class SearchManagerTest {
     ApplicationContext applicationContext;
 
 
-    private static String DIR = "../../../test-store";
+
+    private static String DIR = "";
+
+    static {
+        File resourcesDirectory = new File("src/test/resources");
+        DIR = resourcesDirectory.getAbsolutePath();
+    }
 
    /* @BeforeEach
     void setUp(){
@@ -60,7 +67,7 @@ class SearchManagerTest {
         when(configuration.getStoreLocation()).thenReturn(DIR);
         when(configuration.getSearchProvider()).thenReturn("search-providers.json");
         List<Provider> lp = searchManager.getSearchProviders();
-        assertTrue(lp.size() == 2);
+        assertTrue(lp.size() == 1);
     }
 
     @Test
