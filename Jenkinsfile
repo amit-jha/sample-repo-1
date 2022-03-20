@@ -43,7 +43,7 @@ def deploy(environment) {
 
     	if ("${environment}" == 'dev') {
     		containerName = "search-api-dev"
-    		port = "8080"
+    		port = "9090"
     	}
     	else {
     		println "Environment not valid"
