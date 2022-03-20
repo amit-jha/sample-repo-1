@@ -45,23 +45,6 @@ class SearchManagerTest {
         DIR = resourcesDirectory.getAbsolutePath();
     }
 
-   /* @BeforeEach
-    void setUp(){
-        when(configuration.getStoreLocation()).thenReturn(DIR);
-        when(configuration.getSearchProvider()).thenReturn("search-providers.json");
-        searchManager.setApplicationContext(applicationContext);
-        when(applicationContext.getBean("NY")).thenReturn(new NewYorkTimesSearchAdapter(configuration));
-
-        when(configuration.getArticleDbLocation()).thenReturn("store-db.json");
-        when(configuration.getIndexLocation()).thenReturn("aticles-index.json");
-        when(configuration.getStopWordsLocation()).thenReturn("stopwords.json");
-
-        when(configuration.getApi()).thenReturn(Map.of(
-                "ny-api-url", "https://api.nytimes.com/svc/search/v2/articlesearch.json",
-                "ny-api-key", "bt1jcIAtGnhG9EASWKEu45LWOAxFzndR")
-        );
-    }
-*/
     @Test
     void ListSearchProviders() {
         when(configuration.getStoreLocation()).thenReturn(DIR);

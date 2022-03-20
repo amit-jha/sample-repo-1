@@ -10,10 +10,6 @@ footer Page %page% of %lastpage%
 title Search API
 skinparam responseMessageBelowArrow true
 
-
-SearchController -> AuthService: Authentication Request
-SearchController <-- AuthService: Authentication Response
-
 SearchController -> SearchService: Perform search request
 SearchService -> SearchService: Build \nunified query langauge (UQL) \nobject
 SearchService -> SearchManager: Broadcase search
