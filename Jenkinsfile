@@ -28,7 +28,7 @@ def buildApp(){
 }
 
 def buildImage(){
-    def appImg = docker.build("shanu040/search-api:${BUILD_VERSION}")
+    def appImg = docker.build("shanu040/search-api:1")
 }
 
 /*
