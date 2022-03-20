@@ -1,0 +1,12 @@
+[
+  {
+    "code": "NY",
+    "name": "NY",
+    "active": true
+  },
+  {
+    "code": "TG",
+    "name": "TG",
+    "active": false
+  }
+]
