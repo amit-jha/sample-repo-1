@@ -36,7 +36,7 @@ class SearchManagerTest {
     ApplicationContext applicationContext;
 
 
-    private static String DIR = "/Users/amijha0/repos/SampleSearchApi/src/test/test-store";
+    private static String DIR = "../../../test-store";
 
    /* @BeforeEach
     void setUp(){

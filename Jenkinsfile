@@ -8,7 +8,7 @@ pipeline {
     stages{
         stage("Test"){
             steps{
-                echo "Execute Unit Test - Build Application"
+                echo "Execute Unit Test"
                 unitTest()
 
             }
@@ -24,18 +24,14 @@ pipeline {
 
 
 def unitTest(){
-
-        def appImg = docker.build("shanu040/search-api:1")
-
+   sh 'mvn clean test'
 }
-/*
+
 def buildImage(){
-    dir('SampleSearchApi'){
-            def appImg = docker.build("shanu040/search-api:${BUILD_VERSION}")
-    }
+    def appImg = docker.build("shanu040/search-api:${BUILD_VERSION}")
 }
 
-
+/*
 def deploy(environment) {
 
     	def containerName = ''
