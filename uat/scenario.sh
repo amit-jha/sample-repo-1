@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 hostname='localhost'
-port=$1
+url=$1
 
 #Wait for application to start
 sleep 5
 
 #ping app url
-status_code=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:${port})
+status_code=$(curl -o /dev/null -s -w "%{http_code}" ${url})
 
 echo ${status_code}
 
