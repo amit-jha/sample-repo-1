@@ -9,7 +9,7 @@ pipeline {
         stage("Unit Test"){
             steps{
                 echo "Executing unit tests"
-                runUnitTest
+                runUnitTest()
             }
         }
         stage("Build Application"){
