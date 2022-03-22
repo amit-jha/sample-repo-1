@@ -36,6 +36,18 @@ pipeline {
                 runUAT('9090')
             }
         }
+        stage("Deploy-Prod"){
+                    steps{
+                        echo "Deploying to dev"
+                        deploy('prod')
+                    }
+                }
+        stage("Run UAT-Prod"){
+            steps{
+                echo "Running UAT on prod"
+                runUAT('8080')
+            }
+        }
     }
 }
 
@@ -62,6 +74,10 @@ def deploy(environment) {
     		containerName = "search-api-dev"
     		port = "9090"
     	}
+    	else if ("${environment}" == 'prod') {
+            		containerName = "search-api-prod"
+            		port = "8080"
+            	}
     	else {
     		println "Environment not valid"
     		System.exit(0)
@@ -73,8 +89,8 @@ def deploy(environment) {
 }
 
 def runUAT(port){
-    dir('uat'){
-        sh "scenario.sh ${port}"
-    }
+
+        sh "uat/scenario.sh ${port}"
+
 
 }
