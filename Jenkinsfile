@@ -89,6 +89,6 @@ def deploy(environment) {
 }
 
 def runUAT(port){
-        sh "chmod -R 777 uat/scenario.sh ${port}"
+        sh "chmod -R 777 uat/scenario.sh"
         sh "uat/scenario.sh ${port}"
 }
