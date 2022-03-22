@@ -73,7 +73,7 @@ def deploy(environment) {
 }
 
 def runUAT(port){
-    dir(uat){
+    dir('uat'){
         sh "scenario.sh ${port}"
     }
 
