@@ -33,7 +33,7 @@ pipeline {
         stage("Run UAT-Dev"){
             steps{
                 echo "Running UAT on dev"
-                runUAT('9090')
+                runUAT('http://192.20.0.3:9090')
             }
         }
         stage("Deploy-Prod"){
