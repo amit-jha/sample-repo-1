@@ -7,7 +7,7 @@ port=${port}
 sleep 5
 
 #ping app url
-status_code=$(curl --write-out %{http_status} --out /dev/null --slient ${hostname}:${port})
+status_code=$(curl -s -o /dev/null -w "%{http_code}" localhost:9090)
 
 if [ status_code == 200 ]
 then
