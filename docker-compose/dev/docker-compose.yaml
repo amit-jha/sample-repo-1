@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+
+  configserver:
+    image: shanu040/configserver:latest
+    ports:
+      - "4040:4040"
+    networks:
+      - search-api-network
+
+  search-api:
+    image: shanu040/search-api:latest
+    ports:
+      - "7070:7070"
+    networks:
+      - search-api-network
+    depends_on:
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:4040/
+
+networks:
+  search-api-network:
