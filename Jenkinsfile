@@ -30,24 +30,24 @@ pipeline {
                 deploy('dev')
             }
         }
-        stage("Run UAT-Dev"){
+        /* stage("Run UAT-Dev"){
             steps{
                 echo "Running UAT on dev"
                 runUAT('http://192.20.0.3:9090')
             }
-        }
+        } */
         stage("Deploy-Prod"){
                     steps{
                         echo "Deploying to dev"
                         deploy('prod')
                     }
                 }
-        stage("Run UAT-Prod"){
+        /* stage("Run UAT-Prod"){
             steps{
                 echo "Running UAT on prod"
                 runUAT('http://192.20.0.3:8080')
             }
-        }
+        } */
     }
 }
 
@@ -85,7 +85,7 @@ def deploy(environment) {
 
     	sh "docker ps -f name=${containerName} -q | xargs -r docker stop"
     	sh "docker ps -a -f name=${containerName} -q | xargs -r docker rm"
-    	sh "docker run --rm -d --name=${containerName} --network=${network} --ip=192.20.0.3 -e ARTICLE-FINDER.STORE-LOCATION=/tmp/store -e SPRING.CONFIG.IMPORT=optional:configserver:${config_server_url} -p ${port}:8080 shanu040/search-api:${BUILD_NUMBER}"
+    	sh "docker run --rm -d --name=${containerName} --network=${network} -e ARTICLE-FINDER.STORE-LOCATION=/tmp/store -e SPRING.CONFIG.IMPORT=optional:configserver:${config_server_url} -p ${port}:8080 shanu040/search-api:${BUILD_NUMBER}"
 }
 
 def runUAT(port){
