@@ -53,4 +53,9 @@ public class SearchController {
             return Response.builder().status("Error").build();
         }
     }
+
+    @GetMapping("/")
+    public Response health() {
+        return Response.builder().status("UP").build();
+    }
 }
