@@ -36,12 +36,18 @@ pipeline {
                 runUAT('http://192.20.0.3:9090')
             }
         } */
+         stage("Approve"){
+            steps{
+                echo "Production deployment approval"
+                approveProdDeployment()
+            }
+        }
         stage("Deploy-Prod"){
-                    steps{
-                        echo "Deploying to dev"
-                        deploy('prod')
-                    }
-                }
+            steps{
+                echo "Deploying to dev"
+                deploy('prod')
+            }
+        }
         /* stage("Run UAT-Prod"){
             steps{
                 echo "Running UAT on prod"
@@ -61,6 +67,12 @@ def buildApp(){
 
 def buildImage(){
     def appImg = docker.build("shanu040/search-api:${BUILD_NUMBER}")
+}
+
+def approveProdDeployment(){
+    timeout(time:'1', unit:'DAYS'){
+        input('Do you want to deploy to production')
+    }
 }
 
 def deploy(environment) {
