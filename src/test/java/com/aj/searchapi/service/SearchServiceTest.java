@@ -1,6 +1,7 @@
 package com.aj.searchapi.service;
 
 import com.aj.searchapi.SearchManager;
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.util.Response;
 import com.aj.searchapi.util.UQL;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ class SearchServiceTest {
     }
 
     @Test
-    void performSearch() {
+    void performSearch() throws ApplicationException {
         searchService.performSearch("apple");
         assertEquals(response.getTotal(), 1);
     }

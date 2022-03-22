@@ -2,6 +2,7 @@ package com.aj.searchapi.providers;
 
 import com.aj.searchapi.SearchApiConfiguration;
 import com.aj.searchapi.SearchManager;
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.util.SearchResult;
 import com.aj.searchapi.util.UQL;
 import com.aj.searchapi.util.UQO;
@@ -30,7 +31,7 @@ class NewYorkTimesSearchAdapterTest {
 
 
     @Test
-    void search() {
+    void search() throws ApplicationException {
         UQL uql = new UQL.Builder().keyword("apple").build();
         UQO uqo = new UQO(uql);
         when(configuration.getApi()).thenReturn(Map.of(

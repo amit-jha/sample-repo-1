@@ -1,6 +1,7 @@
 package com.aj.searchapi.providers;
 
 import com.aj.searchapi.SearchApiConfiguration;
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.util.SearchResult;
 import com.aj.searchapi.util.UQO;
 import com.aj.searchapi.util.Util;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class NewYorkTimesSearchAdapter implements Adapter {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(NewYorkTimesSearchAdapter.class);
+
     private SearchApiConfiguration configuration;
 
     @Autowired
@@ -37,7 +41,7 @@ public class NewYorkTimesSearchAdapter implements Adapter {
         this.configuration = configuration;
     }
 
-    private static Logger LOGGER = LoggerFactory.getLogger(NewYorkTimesSearchAdapter.class);
+
     private static final String CODE = "NY";
     private static final String KEY_FOR_API_URL = (CODE+"-api-url").toLowerCase();
     private static final String KEY_FOR_API_KEY = (CODE+"-api-key").toLowerCase();
@@ -46,26 +50,31 @@ public class NewYorkTimesSearchAdapter implements Adapter {
 
 
     @Override
-    public SearchResult search(UQO uqo) {
-        URI uri = buildUri(uqo);
-        HttpRequest request = Util.buildRequest(uri);
-        String response = Util.send(request);
-        ObjectMapper mapper = new ObjectMapper();
-        //INFO: Required for mapping to Optional
+    @CircuitBreaker(name="nyCircuitBreaker")
+    public SearchResult search(UQO uqo) throws ApplicationException {
+        var uri = buildUri(uqo);
+        var request = Util.buildRequest(uri);
+        String response = null;
+        NewYorkTimesSearchAdapter.SearchResultDocument sr = null;
+        var mapper = new ObjectMapper();
+        //INFO: Following snippet enables the use of Java8 features at time on JSON->JavaObject mapping
         mapper.registerModule(new Jdk8Module());
-        SearchResultDocument sr = null;
         try {
-            sr = mapper.readValue(response, SearchResultDocument.class);
+            response = Util.send(request);
+            sr = mapper.readValue(response, NewYorkTimesSearchAdapter.SearchResultDocument.class);
+        } catch (ApplicationException e) {
+            LOGGER.error(String.format("%s - %s", "Error occurred while API call", e.getMessage()));
+            throw new ApplicationException(e);
         } catch (JsonProcessingException e) {
-            LOGGER.error("Error while creating result object");
+            LOGGER.error(String.format("%s - %s", "Error while creating search result object", e.getMessage()));
+            throw new ApplicationException(e);
         }
         return mapToSearchResult(sr);
+
 
     }
 
     private URI buildUri(UQO uqo) {
-        /*var URL = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
-        var API_KEY = "bt1jcIAtGnhG9EASWKEu45LWOAxFzndR";*/
         String url = configuration.getApi().get(KEY_FOR_API_URL);
         String key = configuration.getApi().get(KEY_FOR_API_KEY);
         return UriComponentsBuilder.fromUriString(url)

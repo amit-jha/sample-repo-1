@@ -1,6 +1,7 @@
 package com.aj.searchapi.util;
 
 import com.aj.searchapi.SearchApiConfiguration;
+import com.aj.searchapi.exception.ApplicationException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
@@ -33,19 +34,17 @@ public class Util {
         return httpRequest;
     }
 
-    public static String send(HttpRequest request){
+    public static String send(HttpRequest request) throws ApplicationException {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = null;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException e) {
-            e.printStackTrace();
             LOGGER.error(e.getMessage());
-            //TODO: throw
+            throw new ApplicationException(e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
             LOGGER.error(e.getMessage());
-            //TODO: throw
+            throw new ApplicationException(e);
         }
         return response.body();
     }

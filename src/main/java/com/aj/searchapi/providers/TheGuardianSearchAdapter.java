@@ -1,6 +1,7 @@
 package com.aj.searchapi.providers;
 
 import com.aj.searchapi.SearchApiConfiguration;
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.util.SearchResult;
 import com.aj.searchapi.util.UQO;
 import com.aj.searchapi.util.Util;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.swing.*;
 import java.awt.font.MultipleMaster;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -48,18 +51,24 @@ public class TheGuardianSearchAdapter implements Adapter {
 
 
     @Override
-    public SearchResult search(UQO uqo) {
+    @CircuitBreaker(name = "tgCircuitBreaker")
+    public SearchResult search(UQO uqo) throws ApplicationException {
         var uri = buildUri(uqo);
         var request = Util.buildRequest(uri);
-        var response = Util.send(request);
-        var mapper = new ObjectMapper();
-        //INFO: Required for mapping to Optional
-        mapper.registerModule(new Jdk8Module());
+        String response = null;
         SearchResultDocument sr = null;
+        var mapper = new ObjectMapper();
+        //INFO: Following snippet enables the use of Java8 features at time on JSON->JavaObject mapping
+        mapper.registerModule(new Jdk8Module());
         try {
+            response = Util.send(request);
             sr = mapper.readValue(response, SearchResultDocument.class);
+        } catch (ApplicationException e) {
+            LOGGER.error(String.format("%s - %s", "Error occurred while API call", e.getMessage()));
+            throw new ApplicationException(e);
         } catch (JsonProcessingException e) {
-            LOGGER.error("Error while creating result object");
+            LOGGER.error(String.format("%s - %s", "Error while creating search result object", e.getMessage()));
+            throw new ApplicationException(e);
         }
         return mapToSearchResult(sr);
 
@@ -89,7 +98,7 @@ public class TheGuardianSearchAdapter implements Adapter {
                             .stream()
                             .map(kw -> kw.getName())
                             .collect(Collectors.toList()))
-                    //INFO: Use of() static factory method with Optional.
+                     //INFO: Use of() static factory method with Optional.
                     // To ensure that if any of the headline is null the Supply a default value as "none"
                     .titles(List.of(
                             result.getTitle(),

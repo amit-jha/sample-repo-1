@@ -1,5 +1,6 @@
 package com.aj.searchapi.controller;
 
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.service.SearchService;
 import com.aj.searchapi.util.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class SearchControllerTest {
 
 
     @Test
-    void search(){
+    void search() throws ApplicationException {
         when(searchService.performSearch("apple", 0)).thenReturn(response);
         searchController.search("apple", 0);
         assertEquals(response.getTotal(), 1);

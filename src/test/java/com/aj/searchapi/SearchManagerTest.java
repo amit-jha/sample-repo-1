@@ -1,5 +1,6 @@
 package com.aj.searchapi;
 
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.providers.Adapter;
 import com.aj.searchapi.providers.NewYorkTimesSearchAdapter;
 import com.aj.searchapi.providers.Provider;
@@ -46,7 +47,7 @@ class SearchManagerTest {
     }
 
     @Test
-    void ListSearchProviders() {
+    void ListSearchProviders() throws ApplicationException {
         when(configuration.getStoreLocation()).thenReturn(DIR);
         when(configuration.getSearchProvider()).thenReturn("search-providers.json");
         List<Provider> lp = searchManager.getSearchProviders();
@@ -54,7 +55,7 @@ class SearchManagerTest {
     }
 
     @Test
-    void getPublisherCode() {
+    void getPublisherCode() throws ApplicationException {
         when(configuration.getStoreLocation()).thenReturn(DIR);
         when(configuration.getSearchProvider()).thenReturn("search-providers.json");
         List<Provider> lp = searchManager.getSearchProviders();
@@ -62,7 +63,7 @@ class SearchManagerTest {
     }
 
     @Test
-    void getPublisherAdapter() {
+    void getPublisherAdapter() throws ApplicationException {
         when(configuration.getStoreLocation()).thenReturn(DIR);
         when(configuration.getSearchProvider()).thenReturn("search-providers.json");
         searchManager.setApplicationContext(applicationContext);
@@ -72,7 +73,7 @@ class SearchManagerTest {
     }
 
     @Test
-    void searchResult() {
+    void searchResult() throws ApplicationException {
         UQL uql = new UQL.Builder().keyword("apple").build();
         UQO uqo = new UQO(uql);
 

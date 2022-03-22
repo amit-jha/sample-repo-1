@@ -10,6 +10,9 @@ import java.util.List;
 @Setter
 public class Response {
 
+    @JsonProperty("status")
+    private String status;
+
     @JsonProperty("searchTerm")
     private String searchTerm;
 

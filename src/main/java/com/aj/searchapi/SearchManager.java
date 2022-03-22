@@ -1,5 +1,6 @@
 package com.aj.searchapi;
 
+import com.aj.searchapi.exception.ApplicationException;
 import com.aj.searchapi.providers.Adapter;
 import com.aj.searchapi.providers.Provider;
 import com.aj.searchapi.util.*;
@@ -37,15 +38,17 @@ public class SearchManager implements ApplicationContextAware {
     }
 
 
-    public Response broadcastSearch(UQL uql) {
+    public Response broadcastSearch(UQL uql) throws ApplicationException {
         List<Adapter> adapters = getSearchAdapters();
         var srs = adapters.stream()
                 .map(searchAdapter -> {
-                     return searchAdapter
-                            .search(UQO.builder()
-                                    .q(uql.getKeyword())
-                                    .page(uql.getPage())
-                                    .build());
+                    SearchResult sr = null;
+                    try {
+                        sr = getSearchResult(uql, searchAdapter);
+                    } catch (ApplicationException e) {
+                        e.printStackTrace();
+                    }
+                    return sr;
                 })
                 .collect(Collectors.toList());
         Response mergedResponse = merger(srs);
@@ -56,6 +59,14 @@ public class SearchManager implements ApplicationContextAware {
         new Thread(r).start();
 
         return mergedResponse;
+    }
+
+    private SearchResult getSearchResult(UQL uql, Adapter searchAdapter) throws ApplicationException {
+        return searchAdapter
+               .search(UQO.builder()
+                       .q(uql.getKeyword())
+                       .page(uql.getPage())
+                       .build());
     }
 
     private Response merger(List<SearchResult> srs) {
@@ -82,7 +93,7 @@ public class SearchManager implements ApplicationContextAware {
         return response;
     }
 
-    public List<Provider> getSearchProviders() {
+    public List<Provider> getSearchProviders() throws ApplicationException {
         final File SEARCH_PROVIDERS_FILE = Util.getResource(configuration.getStoreLocation(),configuration.getSearchProvider());
         List<Provider> providers = null;
         if (SEARCH_PROVIDERS_FILE.exists()) {
@@ -90,15 +101,16 @@ public class SearchManager implements ApplicationContextAware {
                 ObjectMapper mapper = new ObjectMapper();
                 providers = Arrays.asList(mapper.readValue(SEARCH_PROVIDERS_FILE, Provider[].class));
             } catch (IOException e) {
-                System.out.println(e);
                 LOGGER.error("Error while mapping JSON to provider");
-                //TODO: throw new ApplicationException(e);
+                TODO: throw new ApplicationException(e);
             }
+        }else{
+            throw new ApplicationException(SEARCH_PROVIDERS_FILE.getName()+ " does not exist");
         }
         return providers;
     }
 
-    public List<Adapter> getSearchAdapters() {
+    public List<Adapter> getSearchAdapters() throws ApplicationException{
         List<Provider> providers = getSearchProviders();
         List<Adapter> adapters = null;
         if (null != providers) {
@@ -108,10 +120,11 @@ public class SearchManager implements ApplicationContextAware {
                         .map(provider -> (Adapter) applicationContext.getBean(provider.code()))
                         .collect(Collectors.toList());
             } catch (Exception e) {
-                System.out.println(e);
                 LOGGER.error("Error while mapping adapters to a provider");
-                //TODO: throw new ApplicationException(e);
+                throw new ApplicationException(e);
             }
+        }else{
+            throw new ApplicationException("Error while reading provider list");
         }
         return adapters;
     }

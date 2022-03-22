@@ -6,13 +6,18 @@ pipeline {
         disableConcurrentBuilds()
     }
     stages{
-        stage("Build Application"){
+        stage("Unit Test"){
             steps{
-                echo "Building application"
-                buildApp()
-
+                echo "Executing unit tests"
+                runUnitTest
             }
         }
+        stage("Build Application"){
+                    steps{
+                        echo "Building application"
+                        buildApp()
+                    }
+                }
         stage("Build Docker Image"){
             steps{
                 echo "Building docker image"
@@ -25,11 +30,21 @@ pipeline {
                 deploy('dev')
             }
         }
+        stage("Run UAT-Dev"){
+            steps{
+                echo "Running UAT on dev"
+                runUAT('9090')
+            }
+        }
     }
 }
 
+def runUnitTest(){
+    sh 'mvn clean test'
+}
+
 def buildApp(){
-    sh 'mvn clean install'
+    sh 'mvn clean install -Dmaven.test.skip=true'
 }
 
 def buildImage(){
@@ -40,6 +55,8 @@ def deploy(environment) {
 
     	def containerName = ''
     	def port = ''
+    	def network = 'search-api-network'
+    	def config-server-url='http://192.20.0.2:4040'
 
     	if ("${environment}" == 'dev') {
     		containerName = "search-api-dev"
@@ -52,5 +69,9 @@ def deploy(environment) {
 
     	sh "docker ps -f name=${containerName} -q | xargs --no-run-if-empty docker stop"
     	sh "docker ps -a -f name=${containerName} -q | xargs -r docker rm"
-    	sh "docker run --rm -d --name=${containerName} --network=search-api-network -e ARTICLE-FINDER.STORE-LOCATION=/tmp/store -e SPRING.CONFIG.IMPORT=optional:configserver:http://192.20.0.2:4040/ -p ${port}:8080 shanu040/search-api:${BUILD_NUMBER}"
+    	sh "docker run --rm -d --name=${containerName} --network=${network} -e ARTICLE-FINDER.STORE-LOCATION=/tmp/store -e SPRING.CONFIG.IMPORT=optional:configserver:${config-server-url} -p ${port}:8080 shanu040/search-api:${BUILD_NUMBER}"
+}
+
+def runUAT(port){
+    sh "uat/scenario.sh ${port}"
 }
