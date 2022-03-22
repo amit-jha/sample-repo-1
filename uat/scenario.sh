@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 hostname='localhost'
-port=${port}
+port=$1
 
 #Wait for application to start
 sleep 5
