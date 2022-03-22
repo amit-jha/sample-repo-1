@@ -67,7 +67,7 @@ def deploy(environment) {
     		System.exit(0)
     	}
 
-    	sh "docker ps -f name=${containerName} -q | xargs --no-run-if-empty docker stop"
+    	sh "docker ps -f name=${containerName} -q | xargs -r docker stop"
     	sh "docker ps -a -f name=${containerName} -q | xargs -r docker rm"
     	sh "docker run --rm -d --name=${containerName} --network=${network} -e ARTICLE-FINDER.STORE-LOCATION=/tmp/store -e SPRING.CONFIG.IMPORT=optional:configserver:${config-server-url} -p ${port}:8080 shanu040/search-api:${BUILD_NUMBER}"
 }
