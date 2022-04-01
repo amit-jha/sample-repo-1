@@ -55,6 +55,11 @@ pipeline {
             }
         } */
     }
+    post {
+        always {
+            publishReport()
+        }
+    }
 }
 
 def runUnitTest(){
@@ -103,4 +108,8 @@ def deploy(environment) {
 def runUAT(port){
         sh "chmod -R 777 uat/scenario.sh"
         sh "uat/scenario.sh ${port}"
+}
+
+def publishReport(){
+       publishCoverage adapters: [jacoco('target/site/jacoco/jacoco.xml')]
 }
