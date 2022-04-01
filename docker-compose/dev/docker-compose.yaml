@@ -3,7 +3,7 @@ version: "3.8"
 services:
 
   configserver:
-    image: shanu040/configserver:latest
+    image: shanu040/config-server:latest
     ports:
       - "4040:4040"
     networks:

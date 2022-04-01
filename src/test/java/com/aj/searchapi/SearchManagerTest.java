@@ -36,8 +36,7 @@ class SearchManagerTest {
 
     @Mock
     ApplicationContext applicationContext;
-
-
+    
 
     private static String DIR = "";
 

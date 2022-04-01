@@ -2,21 +2,27 @@
 
 ### Ask
 
-1. Create a microservice.
-2. Enable basic search from different news providers
-3. Merge results & present it in a unified format.
+#### _Functional_:
+1. Create a News Search microservice.
+   1. End user can perform search.
+   2. Should be accessible from browser & postman.
+   3. Work on offline mode.
+   4. Merge results & present it in a unified format. </br>
+API Sources:
+      1. [The Guardian](https://open-platform.theguardian.com/)
+      2. [The NYTimes](https://developer.nytimes.com/apis) 
 
-### Capacity Estimation 
-Let's assume we have 20K active users and perform an average of 5 searches daily.
-   this give us 20K * 5 = 100K searches daily.<br/>
-1. Storage: Lets assume that, on average retrieved data size is 5KB for a search provider. <br />
-    So to store 1 days data for 2 providers = 100K * 2 * 5 = ~1GB/Day <br/>
-    So for 5 years = 1GB * 365 * 5 = 1.8TB <br/>
+#### _Expected Output_:
+1. Title
+2. List of URLS
+3. List of keywords
+4. Total results
+5. Pagination
 
-2. Bandwidth: if service is getting 1GB data per day it means <br />
-   1GB/84000sec = ~10MB/Sec upload & download bandwidth
-    
-### High Level Design
+### Design Considerations & Constraints:
+1. Search Provider Schema Mapping Configurability:
+2. Can Support N number of providers.
+3. Enable & disable search providers.
 
 
 ### Low Level Design - Sequence Design
@@ -55,43 +61,57 @@ SearchController <-- SearchService: Response Object
 @enduml
 ```
 
-**UQL** - A DSL, user input getting converted to UQL object. Interaction between _service layer_ & _business layer_. 
+**UQL** - A kind of domain object, user input getting converted to UQL object. Interaction between _service layer_ & _business layer_. 
 Abstracting business domain object for building search query. 
 
-**UQO** - An object to interact between SearchManager and other search providers
+**UQO** - An object to interact between SearchManager and search providers
 
-### Design Considerations & Constraints:
-1. Search Provider Schema Mapping Configurability: 
+### Design - OpenAPI Specification 
+```yaml 
+/search:
+    get:
+      summary: "GET search"
+      operationId: "search"
+      parameters:
+      - name: "q"
+        in: "query"
+        required: true
+        schema:
+          type: "string"
+      - name: "page"
+        in: "query"
+        required: true
+        schema:
+          type: "number"
+          format: "int32"
+      responses:
+        "200":
+          description: "OK"
+```
 
-   
-### Creating REACT App
-`npx create-react-app article-finder` <br />
-`npm install react-bootstrap bootstrap@5.1.3` <br />
-`add import 'bootstrap/dist/css/bootstrap.min.css' to index.js` <br />
-`npm install axios` <br />
+### Capacity Estimation
+Let's assume we have 20K active users and perform an average of 5 searches daily.
+this give us 20K * 5 = 100K searches daily.<br/>
+1. Storage: Lets assume that, on average retrieved data size is 5KB for a search provider. <br />
+   So to store 1 days data for 2 providers = 100K * 2 * 5 = ~1GB/Day <br/>
+   So for 5 years = 1GB * 365 * 5 = 1.8TB <br/>
 
-### Prerequisites:
-1. Java 17
-2. SpringBoot 2.6.4
-3. SpringCloud 2021.0.1
-4. reachJs
+2. Bandwidth: if service is getting 1GB data per day it means <br />
+   1GB/84000sec = ~10MB/Sec upload & download bandwidth
 
-### Documentation
-1. Swagger
-2. JavaDoc
 
 ### NFR
 1. Separate repos or code base for each microservice.
-2. Dependencies are managed using dependency manager
-3. Environment specific configurations- manages through a config-server
+2. Dependencies are managed using dependency manager.
+3. Environment specific configurations- manages through a config-server.
 4. Declarative CI/CD pipeline with Single build with different stages for deployment on different environment.
-5. Docker - to ensure stateless process and port binding
+5. Docker - to ensure stateless process and port binding.
 6. Identical deployment  (Dev/QA/Stage/Prod Parity) - Docker image
 7. Security - Key Encryption 
 8. Distributed Logging - 
 9. Exception Handling 
 10. Tracing
-11. Circuit Breaker
+11. Circuit Breaker/Retry
 12. Externalized Configuration
 13. CI/CD - Environment Agnostic Deployment
 
@@ -101,7 +121,25 @@ Abstracting business domain object for building search query.
 3. Test
 4. Ready to deploy on different env
 
-`
+### Prerequisites:
+1. Java 17
+2. SpringBoot 2.6.4
+3. SpringCloud 2021.0.1
+4. ReactJS
+
+
+### Creating REACT App
+`npx create-react-app article-finder` <br />
+`npm install react-bootstrap bootstrap@5.1.3` <br />
+`add import 'bootstrap/dist/css/bootstrap.min.css' to index.js` <br />
+`npm install axios` <br />
+
+
+### Documentation
+1. Swagger (/swagger-ui/index.htm)
+2. JavaDoc
+
+
 ### Deployment
 ` docker create network --subnet=192.20.0.0/16 search-api-network` </br>
 ` docker run --rm -d --network=search-api-network --ip 192.20.0.2 -p 4040:4040 shanu040/search-api-config` < /br>
